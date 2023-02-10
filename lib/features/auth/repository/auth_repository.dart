@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reddit_clone/core/constants/constants.dart';
 import 'package:reddit_clone/core/providers/firebase_providers.dart';
 import 'package:reddit_clone/models/user_model.dart';
 
 import '../../../core/constants/firebase_constants.dart';
+import '../../../core/faliure.dart';
+import '../../../core/typedef.dart';
 
 final authRepositoryProvider = Provider(
   (ref) => AuthRepository(
@@ -33,7 +36,7 @@ class AuthRepository {
   CollectionReference get _users =>
       _firestore.collection(FirebaseConstants.userCollection);
 
-  void signInWithGoogle() async {
+  FutureEither<UserModel> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       final googleAuth = await googleUser?.authentication;
@@ -43,18 +46,24 @@ class AuthRepository {
       );
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
-      UserModel userModel = UserModel(
-        name: userCredential.user!.displayName ?? 'untitled',
-        profilePic: userCredential.user!.photoURL ?? Constansts.avatarDefault,
-        banner: Constansts.bannerDefault,
-        uid: userCredential.user!.uid,
-        isAuthenticated: true,
-        karma: 0,
-        awards: [],
-      );
-      _users.doc(userCredential.user!.uid).set(userModel.toMap());
+      late UserModel userModel;
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        userModel = UserModel(
+          name: userCredential.user!.displayName ?? 'untitled',
+          profilePic: userCredential.user!.photoURL ?? Constansts.avatarDefault,
+          banner: Constansts.bannerDefault,
+          uid: userCredential.user!.uid,
+          isAuthenticated: true,
+          karma: 0,
+          awards: [],
+        );
+        await _users.doc(userCredential.user!.uid).set(userModel.toMap());
+      }
+      return right(userModel);
+    } on FirebaseException catch (e) {
+      throw e.message!;
     } catch (e) {
-      print(e);
+      return left(Failure(e.toString()));
     }
   }
 }
