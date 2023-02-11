@@ -35,7 +35,7 @@ class AuthRepository {
 
   CollectionReference get _users =>
       _firestore.collection(FirebaseConstants.userCollection);
-
+  Stream<User?> get authStateChange => _auth.authStateChanges();
   FutureEither<UserModel> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -58,6 +58,8 @@ class AuthRepository {
           awards: [],
         );
         await _users.doc(userCredential.user!.uid).set(userModel.toMap());
+      } else {
+        userModel = await getUserData(userCredential.user!.uid).first;
       }
       return right(userModel);
     } on FirebaseException catch (e) {
@@ -65,5 +67,13 @@ class AuthRepository {
     } catch (e) {
       return left(Failure(e.toString()));
     }
+  }
+
+  Stream<UserModel> getUserData(String uid) {
+    return _users.doc(uid).snapshots().map(
+          (event) => UserModel.fromMap(
+            event.data() as Map<String, dynamic>,
+          ),
+        );
   }
 }
