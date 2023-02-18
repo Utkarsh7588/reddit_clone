@@ -62,7 +62,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 if (data != null) {
                   getData(ref, data);
                   if (userModel != null) {
-                    return loggedOutRoute;
+                    return loggedInRoute;
                   }
                 }
                 return loggedOutRoute;
