@@ -5,7 +5,7 @@ import 'package:routemaster/routemaster.dart';
 class CommunityListDrawer extends ConsumerWidget {
   const CommunityListDrawer({super.key});
   void navigateTocreateCommunity(BuildContext context) {
-    Routemaster.of(context).push('/cretae-community');
+    Routemaster.of(context).push('/create-community');
   }
 
   @override
@@ -17,7 +17,9 @@ class CommunityListDrawer extends ConsumerWidget {
             ListTile(
               title: const Text('Create a community'),
               leading: const Icon(Icons.add),
-              onTap: () {},
+              onTap: () {
+                navigateTocreateCommunity(context);
+              },
             ),
           ],
         ),
