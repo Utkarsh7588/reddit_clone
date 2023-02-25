@@ -6,9 +6,12 @@ import 'package:fpdart/fpdart.dart';
 
 import '../faliure.dart';
 import '../typedef.dart';
+import 'firebase_providers.dart';
 
-final firebaseStorageProvider = Provider(
-  (ref) => StorageRepository(firebaseStorage: ref.watch(storageProvider)),
+final storageRepositoryProvider = Provider(
+  (ref) => StorageRepository(
+    firebaseStorage: ref.watch(storageProvider),
+  ),
 );
 
 class StorageRepository {
