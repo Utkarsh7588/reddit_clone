@@ -7,6 +7,10 @@ import '../../auth/controller/auth_controller.dart';
 class ProfileDrawer extends ConsumerWidget {
   const ProfileDrawer({super.key});
 
+  void logOut(WidgetRef ref) {
+    ref.read(authControllerProvider.notifier).logOut();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider)!;
@@ -38,9 +42,12 @@ class ProfileDrawer extends ConsumerWidget {
               color: Pallete.redColor,
             ),
             title: const Text('Log Out'),
-            onTap: () {},
+            onTap: () => logOut(ref),
           ),
-          Switch.adaptive(value: true, onChanged: (val) {})
+          Switch.adaptive(
+            value: true,
+            onChanged: (val) {},
+          ),
         ],
       ),
     ));
