@@ -99,11 +99,12 @@ class CommunityController extends StateNotifier<bool> {
         (l) => showSnackBar(context, l.message),
         (r) => community = community.copyWith(banner: r),
       );
-      res.fold(
-        (l) => showSnackBar(context, l.message),
-        (r) => Routemaster.of(context).pop(),
-      );
     }
+    final res = await _communityRepository.editCommunity(community);
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) => Routemaster.of(context).pop(),
+    );
   }
 
   Stream<List<Community>> searchCommunity(String query) {
